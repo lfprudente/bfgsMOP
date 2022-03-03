@@ -27,10 +27,10 @@ Modify myproblem.f90 routine to solve your own problem. Alternatively, set a tes
 
 1) Go to folder and type 
 
-make
+    make
 
 2) Run typing
 
-./MOPsolver
+    ./MOPsolver
 
 and see the output in the screen.
