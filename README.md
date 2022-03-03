@@ -2,9 +2,6 @@ This directory contains the BFGS-Wolfe algorithm, the Standard BFGS-Armijo algor
 
 L. F. Prudente and D. R. Souza, A quasi-Newton method with Wolfe line searches for multiobjective optimization, technical report, 2022.
 
-Date: March of 2022
-License: This code is released under the GNU General Public License
-
 This folder also contains the third-party free codes: 
 1) software Algencan 3.1.1;
     -  E. G. Birgin and J. M. Martı́nez, Practical augmented Lagrangian methods for constrained optimization, SIAM, 2014.
