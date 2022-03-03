@@ -1,0 +1,79 @@
+HSL := $(shell if [ -e $(HSLSRC)/hsl_ma57d.f90 ]; then echo hsl_lma57d.o; fi)
+HSL := $(HSL) $(shell if [ -e $(HSLSRC)/hsl_ma86d.f90 ]; then echo hsl_ma86d.o; fi)
+HSL := $(HSL) $(shell if [ -e $(HSLSRC)/hsl_ma97d.f90 ]; then echo hsl_ma97d.o; fi)
+
+MA57_HSL_DEPS  := lma57ad.o mc71ad.o hsl_zd11d.o
+
+MA86_HSL_DEPS  := hsl_mc34d.o mc64ad.o mc77ad.o hsl_mc68i.o hsl_mc69d.o hsl_mc78i.o
+
+MA97_HSL_DEPS := mc30ad.o hsl_mc34d.o hsl_mc64d.o hsl_mc68i.o	\
+                 hsl_mc69d.o mc77ad.o hsl_mc78i.o hsl_mc80d.o
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -c -o $@ $<
+
+all: lib
+
+lib: $(HSL)
+  ifneq ($(strip $(HSL)),)
+	$(AR) rcs libhsl.a *.o
+	mv -f libhsl.a $(LIB)
+  endif
+
+fakemetis.o: fakemetis.f
+
+hsl_lma57d.o: hsl_lma57d.f90 $(MA57_HSL_DEPS)
+
+hsl_ma86d.o: hsl_ma86d.f90 $(MA86_HSL_DEPS)
+	$(FC) $(FFLAGS) $(OPENMPFLAG) -c -o $@ $<
+
+hsl_ma97d.o: hsl_ma97d.f90 $(MA97_HSL_DEPS)
+	$(FC) $(FFLAGS) $(OPENMPFLAG) -c -o $@ $<
+
+lma57ad.f: ma57ad.f
+	$(HSLSRC)/fix-ma57.sh ma57ad.f
+
+hsl_lma57d.f90: hsl_ma57d.f90
+	$(HSLSRC)/fix-hsl_ma57.sh hsl_ma57d.f90
+
+lma57ad.o: lma57ad.f fakemetis.o mc47ad.o mc64ad.o mc71ad.o
+
+mc21ad.o: mc21ad.f
+
+mc30ad.o: mc30ad.f
+
+mc34ad.o: mc34ad.f
+
+hsl_mc34d.o: hsl_mc34d.f90
+
+mc47ad.o: mc47ad.f mc34ad.o mc59ad.o
+
+mc59ad.o: mc59ad.f
+
+mc64ad.o: mc64ad.f mc21ad.o
+
+hsl_mc64d.o: hsl_mc64d.f90 hsl_mc34d.o mc64ad.o hsl_mc69d.o hsl_zd11d.o
+
+hsl_mc68i.o: hsl_mc68i.f90 fakemetis.o hsl_zb01i.o
+
+hsl_mc69d.o: hsl_mc69d.f90
+
+mc71ad.o: mc71ad.f
+
+mc77ad.o: mc77ad.f
+
+hsl_mc78i.o: hsl_mc78i.f90
+
+hsl_mc80d.o: hsl_mc80d.f90 hsl_mc34d.o mc64ad.o hsl_mc68i.o
+
+hsl_zb01i.o: hsl_zb01i.f90
+
+hsl_zd11d.o: hsl_zd11d.f90
+
+clean:
+	rm -f *.o
+	rm -f *.mod
+	rm -f $(HSLSRC)/lma57ad.f $(HSLSRC)/hsl_lma57d.f90
+
+distclean: clean
+	rm -f $(LIB)/libhsl.a
