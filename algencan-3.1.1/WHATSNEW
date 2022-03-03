@@ -1,0 +1,6 @@
+Version 2.5.0 of ALGENCAN introduces a new Fortran 90 version of
+Algencan with several major modifications (most of them related to the
+usage of dynamic memory). The Acceleration Process was revisited, a
+stopping criterion for infeasible stationary points of an
+infeasibility measurement was added, and many minor updates and
+corrections were made.

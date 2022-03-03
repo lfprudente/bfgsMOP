@@ -1,0 +1,7 @@
+# Batch file for toyprob example
+# Necessary file: toyprob.mod
+
+model toyprob.mod;
+option solver algencan;
+solve;
+
