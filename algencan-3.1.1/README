@@ -1,0 +1,191 @@
+This file containts quick start instructions to install and run
+Algencan. Additional information can be found following the examples
+in sources/examples/. For more detailed information sources are:
+
+(a) The TANGO Project discussion list at:
+
+https://groups.google.com/forum/?fromgroups#!forum/tango-project
+
+and
+
+(b) the book "E. G. Birgin and J. M. Martínez, Practical Augmented
+Lagrangian Methods for Constrained Optimization, Society for
+Industrial and Applied Mathematics, Philadelphia, 2014."
+
+that can be find here:
+
+http://bookstore.siam.org/fa10/
+
+=================================================================
+
+This folder contains Algencan 3.1.1.
+
+Interfaces with AMPL, C/C++, and CUTEst are included. (Note: the 
+interface with AMPL uses .nl files. In consequence, Algencan is able 
+to solve problems written in any modelling language that generates .nl 
+files. Pyomo (www.pyomo.org) is an example of such modelling 
+languages.)
+
+Quick start instructions for using the stand alone Fortran version of
+Algencan 3.1.1, as well as the AMPL, C/C++, and CUTEst interfaces
+follow.
+
+All the environment variables that will be mentioned from now on must
+be set within file $(ALGENCAN)/Makefile. The first environment
+variable that must be set is ALGENCAN and it must point to the folder
+where Algencan was installed (i.e. the tarball file uncompressed), for
+example:
+
+ALGENCAN := $(HOME)/algencan
+
+Algencan includes some algorithmic options that may require the usage
+of MA57, MA86, and/or MA97 from HSL to solve sparse linear
+systems. Those subroutines ARE NOT MANDATORY and Algencan can be used
+without them. If you decide to provide any of the HSL subroutines,
+please, place a copy of each of them in folder
+$(ALGENCAN)/sources/hsl/. It should be stressed that using the HSL
+subroutines might be essential to obtain good performance in many
+problems. We now provide instructions for the usage of MA57
+subroutine.
+
+Note that the file corresponding to the MA57 subroutine must include
+all of its HSL, BLAS and MeTiS dependencies, which are distributed
+along with both the complete HSL library and the individual MA57
+package, available free of charge for academic research use.
+
+If you have purchased and downloaded the complete library, the files
+that need to be concatenated into one (named ma57ad.f) in order to
+satisfy the above mentioned dependencies are:
+
+(i) From BLAS: dgemm.f, dgemv.f, dtpsv.f, idamax.f, lsame.f, xerbla.f.
+
+(ii) From HSL: fd15ad.f, ma57ad.f, mc21ad.f, mc34ad.f, mc47ad.f,
+mc59ad.f, mc64ad.f, mc71ad.f.
+
+(iii) MeTiS dummy routine (metis.f).
+
+Finally, please observe that ALGENCAN supports only the Fortran 90,
+double precision version of those subroutines.
+
+Stand alone Fortran:
+====================
+
+1) Go to folder $ALGENCAN and type 
+
+make
+
+It will generate the Algencan library file named 'libalgencan.a'
+within folder $ALGENCAN/lib/.
+
+2) Go to the folder were your main file and problem subroutines
+are. If you did not code them yet, you may copy the Fortran~90 file
+toyprob.f90, located at $ALGENCAN/examples/f90/ into your folder.
+
+3) Compile (the example file) typing: 
+
+gfortran -O3 toyprob.f90 -L$ALGENCAN/lib -lalgencan -o algencan
+ 
+4) Run typing 
+
+./algencan
+
+and see the output in the screen.
+
+5) Use toyprob.f90 as an example to code and solve your own
+problem. Give a look at the other simple examples toyprob2.f90 and
+toyprob3.f90.
+
+AMPL interface: 
+===============
+
+1) Type make algencan-ampl. It will generate an executable file called
+algencan situated within folder $(ALGENCAN)/bin/ampl/.
+
+2) Go to your own folder and copy to it files algencan.run and
+toyprob.mod situated in $(ALGENCAN)/sources/interfaces/ampl/.
+
+3) Add folder $(ALGENCAN)/bin/ampl to your PATH environment variable.
+
+4) Enter into AMPL and run ALGENCAN typing include algencan.run.
+
+5) Use toyprob.mod as an example to code and solve your own problem.
+
+Obs1: It is assumed that (i) the environment variable AMPL points to
+the folder where AMPL is installed and that (ii) you have downloaded
+solvers.tar from the AMPL web page at Netlib
+(http://netlib.sandia.gov/ampl/) and (following the instructions in
+the README file) built file $(AMPL)/solvers/amplsolver.a.
+(Alternatively, you can download the complete directory 'solvers' from
+http://netlib.sandia.gov/cgi-bin/netlib/netlibfiles.tar?filename=netlib/ampl/solvers)
+
+Obs2: Instructions above suggest how to solve a problem written in 
+AMPL using Algencan from within the AMPL environment. Alternatively, 
+AMPL can be used to generate the problem .nl file and Algencan me be 
+used to solve the problem from the command line. In addition, this 
+means that Algencan is able to solve problems written in any modelling 
+language that generates .nl files such as, for example Pyomo (www.pyomo.org).
+
+C/C++ interface:
+================
+
+1) Follow step 1 in the instructions for the "Stand alone Fortran"
+version above in order to create the Algencan library.
+
+2) Go to your own folder and, as an example, copy to it file toyprob.c
+that is situated at $(ALGENCAN)/sources/examples/c/.
+
+3) Compile typing 
+
+gcc -O3 toyprob.c -L$ALGENCAN/lib -lalgencan -lgfortran -lm -o algencan
+
+4) Run typing 
+
+./algencan
+
+and see the output in the screen.
+
+5) Use toyprob.c as an example to code and solve your own
+problem. Give a look at the other simple examples toyprob2.c and
+toyprob3.c.
+
+CUTEst interface:
+================
+
+1) Type make algencan-cutest PROBNAME=ALLINITC. It will generate an
+executable file called algencan situated in folder
+$(ALGENCAN)/bin/cuter/.
+
+2) Go to your own folder and move to it file OUTSDIF.d situated in
+$(ALGENCAN)/bin/cuter/.
+
+3) From your own folder (were you have moved file OUTSDIF.d) run
+ALGENCAN follwing one of the options above:
+
+3a) Type $(ALGENCAN)/bin/cuter/algencan.
+
+3b) Move file $(ALGENCAN)/bin/cuter/algencan to your own folder and
+type algencan.
+
+3c) Add $(ALGENCAN)/bin/cuter to your PATH environment variable and
+type algencan.
+
+4) In the example above, ALLINITC corresponds to a SIF file called
+ALLINITC.SIF containing the description of the problem to be
+solved. Change the name of the problem to solve other problems from
+the CUTEr collection.
+
+Obs1: It is assumed that you already installed the double precision
+versions of CUTEr and SifDec and that you have set the environment
+variables CUTER, SIFDEC and MASTSIF.
+
+Directory $(SIFDEC)/double/bin/ must contain the executable file
+sifdec, while $(MASTSIF) must contain the SIF files. Directory
+$(CUTER)/double/bin/ must contain file linpac.o and
+$(CUTER)/double/lib/ must contain file libcuter.a.
+
+Examples of these variables follow:
+
+MASTSIF  := $(HOME)/MastSIF/mastsif
+SIFDEC   := $(HOME)/SifDec/SifDec.custom.pc.lnx.gfo
+CUTER    := $(HOME)/CUTEr/cuter-export/CUTEr.custom.pc.lnx.gfo
+
