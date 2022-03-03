@@ -1,0 +1,134 @@
+HSL := $(shell if [ -e $(HSLSRC)/hsl_ma57d.f90 ]; then echo hsl_lma57d.o; fi)
+HSL := $(HSL) $(shell if [ -e $(HSLSRC)/hsl_ma86d.f90 ]; then echo hsl_ma86d.o; fi)
+HSL := $(HSL) $(shell if [ -e $(HSLSRC)/hsl_ma97d.f90 ]; then echo hsl_ma97d.o; fi)
+
+MA57_HSL_DEPS  := lma57ad.o mc71ad.o hsl_zd11d.o
+MA57_BLAS_DEPS := dgemm.o dtpmv.o dtpsv.o
+
+MA86_HSL_DEPS  := hsl_mc34d.o mc64ad.o mc77ad.o hsl_mc68i.o hsl_mc69d.o hsl_mc78i.o
+MA86_BLAS_DEPS := daxpy.o dcopy.o dgemm.o dgemv.o dswap.o dtrsm.o dtrsv.o
+
+MA97_HSL_DEPS := mc30ad.o hsl_mc34d.o hsl_mc64d.o hsl_mc68i.o \
+                 hsl_mc69d.o mc77ad.o hsl_mc78i.o hsl_mc80d.o
+MA97_BLAS_DEPS := daxpy.o dgemm.o dgemv.o dnrm2.o dswap.o dsyrk.o \
+                  dtrmm.o dtrmv.o dtrsm.o dtrsv.o
+MA97_LPCK_DEPS := dpotrf.o
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -c -o $@ $<
+
+all: lib
+
+lib: $(HSL)
+  ifneq ($(strip $(HSL)),)
+	$(AR) rcs libhsl.a *.o
+	mv -f libhsl.a $(LIB)
+  endif
+
+fakemetis.o: fakemetis.f
+
+hsl_lma57d.o: hsl_lma57d.f90 $(MA57_HSL_DEPS) $(MA57_BLAS_DEPS)
+
+hsl_ma86d.o: hsl_ma86d.f90 $(MA86_HSL_DEPS) $(MA86_BLAS_DEPS)
+	$(FC) $(FFLAGS) $(OPENMPFLAG) -c -o $@ $<
+
+hsl_ma97d.o: hsl_ma97d.f90 $(MA97_HSL_DEPS) $(MA97_BLAS_DEPS) $(MA97_LPCK_DEPS)
+	$(FC) $(FFLAGS) $(OPENMPFLAG) -c -o $@ $<
+
+lma57ad.f: ma57ad.f
+	$(HSLSRC)/fix-ma57.sh ma57ad.f
+
+hsl_lma57d.f90: hsl_ma57d.f90
+	$(HSLSRC)/fix-hsl_ma57.sh hsl_ma57d.f90
+
+lma57ad.o: lma57ad.f dgemm.o dgemv.o dtpsv.o fakemetis.o mc47ad.o mc64ad.o mc71ad.o
+
+mc21ad.o: mc21ad.f
+
+mc30ad.o: mc30ad.f
+
+mc34ad.o: mc34ad.f
+
+hsl_mc34d.o: hsl_mc34d.f90
+
+mc47ad.o: mc47ad.f mc34ad.o mc59ad.o
+
+mc59ad.o: mc59ad.f
+
+mc64ad.o: mc64ad.f mc21ad.o
+
+hsl_mc64d.o: hsl_mc64d.f90 hsl_mc34d.o mc64ad.o hsl_mc69d.o hsl_zd11d.o
+
+hsl_mc68i.o: hsl_mc68i.f90 fakemetis.o hsl_zb01i.o
+
+hsl_mc69d.o: hsl_mc69d.f90
+
+mc71ad.o: mc71ad.f idamax.o
+
+mc77ad.o: mc77ad.f
+
+hsl_mc78i.o: hsl_mc78i.f90
+
+hsl_mc80d.o: hsl_mc80d.f90 hsl_mc34d.o mc64ad.o hsl_mc68i.o
+
+hsl_zb01i.o: hsl_zb01i.f90
+
+hsl_zd11d.o: hsl_zd11d.f90
+
+daxpy.o: daxpy.f
+
+dcopy.o: dcopy.f
+
+dgemm.o: dgemm.f lsame.o xerbla.o
+
+dgemv.o: dgemv.f lsame.o xerbla.o
+
+ddot.o: ddot.f
+
+disnan.o: disnan.f dlaisnan.o
+
+dlaisnan.o: dlaisnan.f
+
+dnrm2.o: dnrm2.f
+
+dpotf2.o: dpotf2.f dgemv.o dscal.o ddot.o disnan.o lsame.o xerbla.o
+
+dpotrf.o: dpotrf.f dgemm.o dpotf2.o dsyrk.o dtrsm.o ilaenv.o lsame.o xerbla.o
+
+dscal.o: dscal.f
+
+dswap.o: dswap.f
+
+dsyrk.o: dsyrk.f lsame.o xerbla.o
+
+dtpmv.o: dtpmv.f lsame.o xerbla.o
+
+dtpsv.o: dtpsv.f lsame.o xerbla.o
+
+dtrmm.o: dtrmm.f lsame.o xerbla.o
+
+dtrmv.o: dtrmv.f lsame.o xerbla.o
+
+dtrsm.o: dtrsm.f lsame.o xerbla.o
+
+dtrsv.o: dtrsv.f lsame.o xerbla.o
+
+idamax.o: idamax.f
+
+ieeeck.o: ieeeck.f
+
+ilaenv.o: ilaenv.f iparmq.o ieeeck.o
+
+iparmq.o: iparmq.f
+
+lsame.o: lsame.f
+
+xerbla.o: xerbla.f
+
+clean:
+	rm -f *.o
+	rm -f *.mod
+	rm -f $(HSLSRC)/lma57ad.f $(HSLSRC)/hsl_lma57d.f90
+
+distclean: clean
+	rm -f $(LIB)/libhsl.a
