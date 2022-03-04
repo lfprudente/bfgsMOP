@@ -5,7 +5,7 @@ L. F. Prudente and D. R. Souza, A quasi-Newton method with Wolfe line searches f
 
 
 - MOPsolverBFGS.f90: routine containing the BFGS-Wolfe algorithm
-- MOPsolverStBFGSWolfe.f90: routine containing the Standard BFGS-Armijo algorithm
+- MOPsolverStBFGSArmijo.f90: routine containing the Standard BFGS-Armijo algorithm
 - MOPsolverStBFGSWolfe.f90: routine containing the Standard BFGS-Wolfe algorithm
 
 This folder also contains the third-party free codes: 
