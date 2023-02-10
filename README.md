@@ -1,8 +1,7 @@
 This directory contains the BFGS-Wolfe algorithm, the Standard BFGS-Armijo algorithm and the Standard BFGS-Wolfe algorithm for solving multiobjective optimization problems described in the paper:
 
-L. F. Prudente and D. R. Souza, A quasi-Newton method with Wolfe line searches for multiobjective optimization, technical report, 2022.
-    http://www.optimization-online.org/DB_HTML/2021/09/8593.html
-
+L. F. Prudente and D. R. Souza, [A quasi-Newton method with Wolfe line searches for multiobjective optimization](https://link.springer.com/article/10.1007/s10957-022-02072-5), *Journal of Optimization Theory and Applications* 194, pp. 1107-1140, 2022.
+  
 
 - MOPsolverBFGS.f90: routine containing the BFGS-Wolfe algorithm (a BFGS algorithm with the Hessian approximations updated at each iteration and step sizes satisfying the Wolfe condition)
 - MOPsolverStBFGSArmijo.f90: routine containing the Standard BFGS-Armijo algorithm (a BFGS algorithm with a cautious update to the Hessian approximations and step sizes satisfying the Armijo condition)
